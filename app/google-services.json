@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "480232843426",
+    "project_id": "cafetariaapp",
+    "storage_bucket": "cafetariaapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:480232843426:android:ed4de0862a3c4a2fc7cffb",
+        "android_client_info": {
+          "package_name": "com.example.cafeteriaapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "480232843426-l6q2rboadmgmeboosnbl24g063mtf9lj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cafeteriaapp",
+            "certificate_hash": "8f4e1cd00afab82c10763f70c2deb97527052af5"
+          }
+        },
+        {
+          "client_id": "480232843426-lnu577p3625av5dj9ndls7kjgqrtukt4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuensTCYYKb0GfqAOOcwqSy7IB7DGYIMQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "480232843426-lnu577p3625av5dj9ndls7kjgqrtukt4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
