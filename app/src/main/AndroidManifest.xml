@@ -5,7 +5,6 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.CAMERA"/>
 
 
@@ -33,7 +32,6 @@
             android:name=".OrderDoneActivity"
             android:configChanges="orientation|screenSize" />
         <activity android:name=".PaymentActivity" />
-        <activity android:name=".SearchMenuActivity" />
         <activity android:name=".PreviewDetailsActivity" />
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".UserMenuOrderActivity" />

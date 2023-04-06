@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cafy</string>
+    <string name="app_name">LoCaf</string>
     <string name="app_version_number">1.0.0</string>
 
     <string name="food_categories">Food Categories</string>

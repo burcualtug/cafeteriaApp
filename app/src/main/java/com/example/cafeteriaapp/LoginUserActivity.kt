@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
@@ -48,6 +49,7 @@ class LoginUserActivity : AppCompatActivity() {
 
         emailTIL = findViewById(R.id.login_email_til)
         passwordTIL = findViewById(R.id.login_password_til)
+
 
         findViewById<TextView>(R.id.login_forgot_password_tv).setOnClickListener {userForgotPassword()}
     }
@@ -137,8 +139,11 @@ class LoginUserActivity : AppCompatActivity() {
     private fun checkGenderSavedOrNot() {
         val user = auth.currentUser!!
         val empName = user.displayName!!
+        val companyID = databaseRef.child("matches").child(user.uid).child("organizationID").toString()
 
-        databaseRef.child("employees")
+        Toast.makeText(this, companyID, Toast.LENGTH_SHORT).show()
+        Log.d("COMPANYID",companyID)
+        databaseRef.child("02867815").child("employees")
             .child(user.uid).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val empGender = snapshot.child("gender").value.toString()

@@ -3,23 +3,29 @@ package com.example.cafeteriaapp
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.net.toUri
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import repositories.UserRepository
 import java.lang.Exception
 
 class UserProfileActivity : AppCompatActivity() {
-
+    //private val repository: UserRepository = TODO()
     private lateinit var sharedPref: SharedPreferences
+
+    private val _orgIDData  = MutableLiveData<String>()
+    val orgIDData : LiveData<String>
+        get() = _orgIDData
 
     override fun onStart() {
         super.onStart()
@@ -29,18 +35,47 @@ class UserProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
-
         val gender = intent?.getStringExtra("gender")
         if(gender == "female") {
             findViewById<CircleImageView>(R.id.profile_user_icon).setImageDrawable(resources.getDrawable(R.drawable.user_female))
         }
 
         sharedPref = getSharedPreferences("user_profile_details", MODE_PRIVATE)
-        loadUserProfile()
+        getOrgID()
+        //loadUserProfile()
     }
+    /*init{
+        GlobalScope.launch { getLevel() }
+    }
+    suspend fun getLevel() {
+        val obj = repositories.UserRepository()
+        val user = FirebaseAuth.getInstance().currentUser!!
+        _orgIDData.value = obj.returncompanyID(user.uid)
+        Toast.makeText(this,_orgIDData.value,Toast.LENGTH_SHORT).show()
+    }*/
+    private fun getOrgID(){
 
-    private fun loadUserProfile() {
+        val user = FirebaseAuth.getInstance().currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
 
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+
+                    Log.d("GLBID",globalOrgID)
+                    loadUserProfile(globalOrgID)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+    }
+    private fun loadUserProfile(globalOrgID:String) {
+
+        Toast.makeText(this,globalOrgID,Toast.LENGTH_SHORT).show()
+        val companyID = intent?.getStringExtra("organization")
         if(sharedPref.getString("emp_name", "none") != "none") {
             //it will load the details from offline, so it doesn't need to connect with online database, it will be fast
             loadOfflineUserProfile()
@@ -52,10 +87,11 @@ class UserProfileActivity : AppCompatActivity() {
 
             editor.putString("emp_name", user.displayName!!)
             editor.putString("emp_email", user.email!!)
-
             val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
-            databaseRef.child("employees")
-                .child(user.uid).addListenerForSingleValueEvent(object : ValueEventListener {
+            //databaseRef.child("employees").child(user.uid)
+
+            databaseRef.child(globalOrgID).child("employees").child(user.uid)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
 
                         editor.putString("emp_id_no", snapshot.child("emp_id").value.toString())

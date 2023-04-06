@@ -24,6 +24,7 @@ import com.google.firebase.storage.StorageReference
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import datamodels.IdCardModel
+import repositories.UserRepository
 import java.util.*
 
 
@@ -32,6 +33,7 @@ class RegisterUserActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var databaseRef: DatabaseReference
     private lateinit var storageRef: StorageReference
+    private lateinit var databaseRef2: DatabaseReference
 
     private lateinit var employeeIDCardIV: ImageView
 
@@ -45,6 +47,8 @@ class RegisterUserActivity : AppCompatActivity() {
 
     private lateinit var employeeIDCardUri: Uri
     var idUploaded = false
+
+    var companyID: String = ""
 
     private lateinit var agreeCheckBox: CheckBox
     private lateinit var registerBtn: Button
@@ -62,6 +66,7 @@ class RegisterUserActivity : AppCompatActivity() {
         Handler().postDelayed({ doubleBackToExit = false }, 2000)
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_user)
@@ -69,6 +74,7 @@ class RegisterUserActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         databaseRef = FirebaseDatabase.getInstance().reference.child("employees")
         storageRef = FirebaseStorage.getInstance().reference.child("employeeIdCards")
+        databaseRef2 = FirebaseDatabase.getInstance().reference
 
         fullNameTIL = findViewById(R.id.register_full_name_til)
         emailTIL = findViewById(R.id.register_email_til)
@@ -86,9 +92,17 @@ class RegisterUserActivity : AppCompatActivity() {
             registerBtn.isEnabled = agreeCheckBox.isChecked
         }
 
+        val companyIDGlobal = organizationTIL.editText!!.text.toString()
         registerProgressDialog = ProgressDialog(this)
         registerBtn.setOnClickListener { registerEmployee() }
     }
+    companion object {
+        var globalVar = ""
+    }
+    private val repository: UserRepository
+        get() {
+            TODO()
+        }
 
     fun chooseImageFromGallery(view: View) {
         CropImage
@@ -270,8 +284,16 @@ class RegisterUserActivity : AppCompatActivity() {
         val orgName = organizationTIL.editText!!.text.toString()
         val empIDNo = employeeIDTIL.editText!!.text.toString()
         val mobileNo = mobileNumberTIL.editText!!.text.toString()
+        companyID = organizationTIL.editText!!.text.toString()
+        globalVar=companyID
 
-        val employee = databaseRef.child(user.uid)
+        //repository.returncompanyID(companyID)
+        //val employee = databaseRef.child(user.uid)
+        val employees = databaseRef2.child(companyID).child("employees")
+        val employee = employees.child(user.uid)
+        val matches = databaseRef2.child("matches")
+        val match = matches.child(user.uid)
+
         employee.child("organization").setValue(orgName)
         employee.child("emp_id").setValue(empIDNo)
         employee.child("mobile_no").setValue(mobileNo)
@@ -280,6 +302,7 @@ class RegisterUserActivity : AppCompatActivity() {
         employee.child("reg_date").setValue(getRegDate())
         employee.child("emp_id_card_uri").setValue(idCardDownloadUri)
 
+        match.child("organizationID").setValue(orgName)
         sendEmailVerification(user)
     }
 

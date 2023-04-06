@@ -86,4 +86,7 @@ dependencies {
 
     implementation"com.theartofdev.edmodo:android-image-cropper:2.8.0"
     implementation 'com.squareup.picasso:picasso:2.5.2'
+
+    /*implementation "org.kodein.di:kodein-di-generic-jvm:6.2.1"
+    implementation "org.kodein.di:kodein-di-framework-android-x:6.2.1"*/
 }
