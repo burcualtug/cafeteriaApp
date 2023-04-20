@@ -140,7 +140,8 @@ class SettingsActivity : AppCompatActivity(), MenuApi {
         progressDialog.setMessage("Offline Menu is preparing for you...")
         progressDialog.show()
 
-        FirebaseDBService().readAllMenu(this, RequestType.OFFLINE_UPDATE)
+        val shp = sharedPref.getString("emp_org", "11")
+        FirebaseDBService().readAllMenu(this, RequestType.OFFLINE_UPDATE,shp!!)
     }
 
     override fun onFetchSuccessListener(list: ArrayList<MenuItem>, requestType: RequestType) {

@@ -2,6 +2,7 @@ package com.example.cafeteriaapp
 
 import adapters.RecyclerCurrentOrderAdapter
 import android.content.DialogInterface
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeteriaapp.R
+import com.google.firebase.database.*
 import datamodels.CurrentOrderItem
 import services.DatabaseHandler
 
@@ -19,10 +21,18 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
     private val currentOrderList = ArrayList<CurrentOrderItem>()
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerAdapter: RecyclerCurrentOrderAdapter
+    private lateinit var sharedPref: SharedPreferences
+    private lateinit var databaseRef: DatabaseReference
+    private lateinit var cancelButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_current_orders)
+
+        //cancelButton = findViewById(R.id.current_order_item_cancel_btn)
+        sharedPref = getSharedPreferences("user_profile_details", MODE_PRIVATE)
+        databaseRef = FirebaseDatabase.getInstance().reference
+
 
         recyclerView = findViewById(R.id.current_order_recycler_view)
         recyclerAdapter = RecyclerCurrentOrderAdapter(this, currentOrderList, this)
@@ -34,6 +44,40 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
 
     private fun loadCurrentOrdersFromDatabase() {
 
+        val db = DatabaseHandler(this)
+        val data = db.readCurrentOrdersData()
+
+        val shp = sharedPref.getString("emp_org", "11")
+        val ordersDbRef = databaseRef.child(shp!!).child("orders")
+
+        findViewById<LinearLayout>(R.id.current_order_empty_indicator_ll).visibility = ViewGroup.GONE
+        ordersDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (snap in snapshot.children) {
+                    val currentOrderItem =  CurrentOrderItem()
+                    currentOrderItem.orderID = snap.child("order_id").value.toString()
+                    currentOrderItem.takeAwayTime = snap.child("takeAwayTime").value.toString()
+                    currentOrderItem.paymentStatus = snap.child("paymentMethod").value.toString()
+                    currentOrderItem.orderItemNames = snap.child("itemNames").value.toString()
+                    currentOrderItem.orderItemQuantities = snap.child("itemQty").value.toString()
+                    currentOrderItem.totalItemPrice = snap.child("totalItemPrice").value.toString()
+                    currentOrderItem.tax = snap.child("totalTaxPrice").value.toString()
+                    currentOrderItem.subTotal = snap.child("subTotal").value.toString()
+
+                    if(snap.child("situation").value == "1"){
+                        //cancelOrder
+                    }
+                    currentOrderList.add(currentOrderItem)
+                    currentOrderList.reverse()
+                    recyclerAdapter.notifyItemRangeInserted(0, 2)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // HANDLE ERROR
+            }
+        })
+/*
         val db = DatabaseHandler(this)
         val data = db.readCurrentOrdersData()
 
@@ -56,7 +100,7 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
             currentOrderList.add(currentOrderItem)
             currentOrderList.reverse()
             recyclerAdapter.notifyItemRangeInserted(0, data.size)
-        }
+        } */
     }
 
     override fun showQRCode(orderID: String) {
@@ -77,6 +121,10 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
                 val result = DatabaseHandler(this).deleteCurrentOrderRecord(currentOrderList[position].orderID)
                 currentOrderList.removeAt(position)
                 recyclerAdapter.notifyItemRemoved(position)
+                val orgID = sharedPref.getString("emp_org", "11")
+                val orderIDdb = currentOrderList[position].orderID
+                databaseRef.child(orgID!!).child("orders").child(orderIDdb).removeValue()
+
                 recyclerAdapter.notifyItemRangeChanged(position, currentOrderList.size)
                 Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
 

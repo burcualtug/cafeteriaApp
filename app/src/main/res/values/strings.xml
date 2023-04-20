@@ -10,7 +10,7 @@
     <string name="snacks">Snacks</string>
     <string name="cookies">Cookies</string>
     <string name="menu_icon">Menu Icon</string>
-    <string name="cold_drink">Cold drinks</string>
+    <string name="cold_drink">Drinks</string>
     <string name="here_s_what_i_found_for_you">Here\'s what I found for you</string>
     <string name="show_all">Show all</string>
     <string name="noodles">Noodles</string>
@@ -23,7 +23,7 @@
     <string name="your_order">Your Order</string>
     <string name="order_details">Order details</string>
     <string name="total_price">Total Price</string>
-    <string name="tax">Tax</string>
+    <string name="tax">Delivery</string>
     <string name="sub_total">Sub-total</string>
     <string name="time_for_take_away_of_order">Time for take-away of order</string>
     <string name="change_time">Change Time</string>
@@ -90,7 +90,7 @@
     <string name="forgot_password">Forgot Password</string>
     <string name="next">Next</string>
     <string name="full_details">Full Details</string>
-    <string name="cafy_reg_id">Cafy Reg ID</string>
+    <string name="cafy_reg_id">LoCaf Reg ID</string>
     <string name="reg_date">Reg Date</string>
     <string name="choose_image">Choose Image</string>
     <string name="description">Description</string>
@@ -116,7 +116,7 @@
     <string name="developer">Developer</string>
     <string name="app_version">App Version</string>
     <string name="about">About</string>
-    <string name="developer_name">Roshan Kumar</string>
+    <string name="developer_name">Burcu Altuğ</string>
     <string name="remove_all_the_saved_cards">Remove all the saved cards</string>
     <string name="delete_saved_cards">Delete Saved Cards</string>
     <string name="delete_all_the_menu_items_from_offline_data">Delete all the menu items from offline data</string>
@@ -135,10 +135,10 @@
     <string name="have_a_problem">HAVE A PROBLEM !</string>
     <string name="call">Call</string>
     <string name="mail">Mail</string>
-    <string name="thali">Thali</string>
+    <string name="thali">Main Course</string>
     <string name="xxx">XXX</string>
     <string name="default_card_number">2334 xxxx xxxx 6335</string>
     <string name="default_date">09/23</string>
     <string name="hello">Hello!</string>
-    <string name="show_this_qr_code_to_your_office_canteen">Show this QR Code to your Office Canteen</string>
+    <string name="show_this_qr_code_to_your_office_canteen">Show this QR Code to your Local Business</string>
 </resources>

@@ -2,6 +2,7 @@ package com.example.cafeteriaapp
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -10,6 +11,10 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.example.cafeteriaapp.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.StorageReference
 import datamodels.CurrentOrderItem
 import datamodels.OrderHistoryItem
 import services.DatabaseHandler
@@ -25,14 +30,21 @@ class OrderDoneActivity : AppCompatActivity() {
     private lateinit var orderIDTV: TextView
     private lateinit var dateAndTimeTV: TextView
 
-    private var totalItemPrice = 0.0F
-    private var totalTaxPrice = 0.0F
-    private var subTotalPrice = 0.0F
+    private var totalItemPrice = 1.0F
+    private var totalTaxPrice = 1.0F
+    private var subTotalPrice = 1.0F
     private var paymentMethod = ""
     private var takeAwayTime = ""
 
     private var orderID = ""
     private var orderDate = ""
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var databaseRef: DatabaseReference
+    private lateinit var storageRef: StorageReference
+    private lateinit var sharedPref: SharedPreferences
+
+
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -59,6 +71,8 @@ class OrderDoneActivity : AppCompatActivity() {
         paymentMethod = intent?.getStringExtra("paymentMethod").toString()
         takeAwayTime = intent?.getStringExtra("takeAwayTime").toString()
 
+        sharedPref = getSharedPreferences("user_profile_details", MODE_PRIVATE)
+        databaseRef = FirebaseDatabase.getInstance().reference
 
         findViewById<TextView>(R.id.order_done_total_amount_tv).text = "%.2f".format(subTotalPrice)
         findViewById<TextView>(R.id.order_done_payment_method_tv).text = paymentMethod
@@ -107,10 +121,12 @@ class OrderDoneActivity : AppCompatActivity() {
 
     private fun saveOrderRecordToDatabase() {
         val item = OrderHistoryItem(orderDate, orderID, "Order Successful", paymentMethod, "\$%.2f".format(subTotalPrice))
+        val itemBusiness = OrderHistoryItem(orderDate,orderID,"Order Successful",paymentMethod, "\$%.2f".format(subTotalPrice))
         val db = DatabaseHandler(this)
         db.insertOrderData(item)
 
         saveCurrentOrderToDatabase()
+        sendToBusiness()
     }
 
     private fun saveCurrentOrderToDatabase() {
@@ -126,8 +142,23 @@ class OrderDoneActivity : AppCompatActivity() {
         )
         val db = DatabaseHandler(this)
         db.insertCurrentOrdersData(item)
+
+
     }
 
+    fun sendToBusiness(){
+        val orgID = sharedPref.getString("emp_org", "11")
+        val currentOrder = databaseRef.child(orgID!!).child("orders").child(orderID)
+        currentOrder.child("order_id").setValue(orderID)
+        currentOrder.child("takeAwayTime").setValue(takeAwayTime)
+        currentOrder.child("paymentMethod").setValue(paymentMethod)
+        currentOrder.child("itemNames").setValue(getOrderItemNames())
+        currentOrder.child("itemQty").setValue(getOrderItemQty())
+        currentOrder.child("totalItemPrice").setValue(totalItemPrice)
+        currentOrder.child("totalTaxPrice").setValue(totalTaxPrice)
+        currentOrder.child("subTotalPrice").setValue(subTotalPrice)
+        currentOrder.child("situation").setValue("0")
+    }
 
     private fun cancelCurrentOrder() {
         AlertDialog.Builder(this)
@@ -135,6 +166,8 @@ class OrderDoneActivity : AppCompatActivity() {
             .setMessage("Are you sure you want to cancel this order?")
             .setPositiveButton("Yes, Cancel Order", DialogInterface.OnClickListener { _, _ ->
                 val result = DatabaseHandler(this).deleteCurrentOrderRecord(orderID)
+                val orgID = sharedPref.getString("emp_org", "11")
+                val currentOrder = databaseRef.child(orgID!!).child("orders").child(orderID).removeValue()
                 Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
                 onBackPressed()
             })

@@ -523,37 +523,6 @@
                 app:cardElevation="0dp"
                 android:background="@color/white">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="35dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="10dp"
-                        android:src="@drawable/payment_upi"
-                        android:contentDescription="@string/bhim_upi"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/bhim_upi"
-                        android:textSize="16sp"
-                        android:textColor="@color/text_dark_color"/>
-
-                    <RadioButton
-                        android:id="@+id/bhim_upi_radio_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:checked="false"
-                        android:onClick="chooseModeOfPayment"/>
-                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
@@ -624,37 +593,6 @@
                 app:cardElevation="0dp"
                 android:background="@color/white">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="35dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="10dp"
-                        android:src="@drawable/payment_netbanking"
-                        android:contentDescription="@string/net_banking"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/net_banking"
-                        android:textSize="16sp"
-                        android:textColor="@color/text_dark_color"/>
-
-                    <RadioButton
-                        android:id="@+id/net_banking_radio_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:checked="false"
-                        android:onClick="chooseModeOfPayment"/>
-                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 

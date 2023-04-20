@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Parcelable
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -68,6 +69,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
 
     private lateinit var progressDialog: ProgressDialog
 
+    private lateinit var sharedPref: SharedPreferences
     override fun onBackPressed() {
         if (searchIsActive) {
             //un-hiding all the views which are above the items
@@ -99,6 +101,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         auth = FirebaseAuth.getInstance()
         databaseRef = FirebaseDatabase.getInstance().reference
 
+        sharedPref = getSharedPreferences("user_profile_details", MODE_PRIVATE)
         db.clearCartTable()
         loadProfile()
         loadNavigationDrawer()
@@ -214,7 +217,8 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         progressDialog.create()
         progressDialog.show()
 
-        FirebaseDBService().readAllMenu(this, RequestType.READ)
+        val shp = sharedPref.getString("emp_org", "11")
+        FirebaseDBService().readAllMenu(this, RequestType.READ,shp!!)
     }
 
     private fun loadSearchTask() {
@@ -256,6 +260,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         val tag = ((view as LinearLayout).getChildAt(1) as TextView).text.toString()
         val filterList = ArrayList<MenuItem>()
         for (item in allItems) {
+            Log.d("ITEM", item.toString())
             if (item.itemTag == tag) filterList.add(item)
         }
         recyclerFoodAdapter.filterList(filterList)
@@ -425,7 +430,9 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         progressDialog.setMessage("Offline Menu is preparing for you...")
         progressDialog.show()
 
-        FirebaseDBService().readAllMenu(this, RequestType.OFFLINE_UPDATE)
+        val shp = sharedPref.getString("emp_org", "11")
+        Log.d("shp",shp!!)
+        FirebaseDBService().readAllMenu(this, RequestType.OFFLINE_UPDATE,shp!!)
     }
 
     override fun onFetchSuccessListener(list: ArrayList<MenuItem>, requestType: RequestType) {

@@ -84,12 +84,12 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
         walletsRB = findViewById(R.id.wallets_radio_btn)
         savedCardRB = findViewById(R.id.saved_cards_radio_btn)
         creditDebitRB = findViewById(R.id.credit_debit_card_radio_btn)
-        bhimUpiRB = findViewById(R.id.bhim_upi_radio_btn)
-        netBankingRB = findViewById(R.id.net_banking_radio_btn)
+       /* bhimUpiRB = findViewById(R.id.bhim_upi_radio_btn)
+        netBankingRB = findViewById(R.id.net_banking_radio_btn)*/
 
         walletSection = findViewById(R.id.wallets_section_ll)
         creditDebitSection = findViewById(R.id.credit_debit_section_ll)
-        bhimUpiSection = findViewById(R.id.bhim_upi_section_ll)
+        //bhimUpiSection = findViewById(R.id.bhim_upi_section_ll)
 
         setupPaymentButtons()
         setupWallets()
@@ -136,16 +136,16 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
         confirmPaymentBtn = findViewById(R.id.confirm_payment_btn)
         paymentWalletBtn = findViewById(R.id.payment_wallet_btn)
         paymentCreditDebitBtn = findViewById(R.id.payment_credit_debit_card_btn)
-        paymentBhimUpiBtn = findViewById(R.id.payment_bhim_upi_btn)
+        //paymentBhimUpiBtn = findViewById(R.id.payment_bhim_upi_btn)
 
         paymentWalletBtn.text = "Pay Securely \$%.2f".format(subTotalPrice)
         paymentCreditDebitBtn.text = "Pay \$%.2f".format(subTotalPrice)
-        paymentBhimUpiBtn.text = "Pay \$%.2f".format(subTotalPrice)
+        //paymentBhimUpiBtn.text = "Pay \$%.2f".format(subTotalPrice)
 
         confirmPaymentBtn.setOnClickListener { orderDone() }
         paymentWalletBtn.setOnClickListener { orderDone() }
         paymentCreditDebitBtn.setOnClickListener { doCreditDebitCardPayment() }
-        paymentBhimUpiBtn.setOnClickListener { doBHIMUPIPayment() }
+       // paymentBhimUpiBtn.setOnClickListener { doBHIMUPIPayment() }
     }
 
     private fun doBHIMUPIPayment() {
@@ -215,12 +215,12 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
         walletsRB.isChecked = false
         savedCardRB.isChecked = false
         creditDebitRB.isChecked = false
-        bhimUpiRB.isChecked = false
-        netBankingRB.isChecked = false
+        /*bhimUpiRB.isChecked = false
+        netBankingRB.isChecked = false*/
 
         walletSection.visibility = ViewGroup.GONE
         creditDebitSection.visibility = ViewGroup.GONE
-        bhimUpiSection.visibility = ViewGroup.GONE
+        //bhimUpiSection.visibility = ViewGroup.GONE
         savedCardRecyclerView.visibility = ViewGroup.GONE
 
         confirmPaymentBtn.visibility = ViewGroup.INVISIBLE
@@ -243,6 +243,7 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
                 creditDebitRB.isChecked = true
                 creditDebitSection.visibility = ViewGroup.VISIBLE
             }
+            /*
             getString(R.string.bhim_upi) -> {
                 bhimUpiRB.isChecked = true
                 bhimUpiSection.visibility = ViewGroup.VISIBLE
@@ -250,7 +251,7 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
             getString(R.string.net_banking) -> {
                 Toast.makeText(this, "NOT AVAILABLE", Toast.LENGTH_SHORT).show()
                 netBankingRB.isChecked = true
-            }
+            }*/
         }
     }
 
@@ -260,8 +261,8 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
             cashPaymentRB.isChecked -> paymentMethod = "Pending: Cash Payment"
             walletsRB.isChecked -> paymentMethod = "Paid: $selectedWallet Wallet"
             savedCardRB.isChecked -> paymentMethod = "Paid: $selectedSavedCard"
-            creditDebitRB.isChecked -> paymentMethod = "Paid: $enteredCreditDebitCard"
-            bhimUpiRB.isChecked -> paymentMethod = "Paid: $enteredUPI"
+            //creditDebitRB.isChecked -> paymentMethod = "Paid: $enteredCreditDebitCard"
+            //bhimUpiRB.isChecked -> paymentMethod = "Paid: $enteredUPI"
             //netBankingRB.isChecked -> paymentMethod = "Paid: Net Banking"
         }
 
