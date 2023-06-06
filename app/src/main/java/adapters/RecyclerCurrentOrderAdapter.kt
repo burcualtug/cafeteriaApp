@@ -2,6 +2,7 @@ package adapters
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,9 +22,11 @@ class RecyclerCurrentOrderAdapter(
 ) :
     RecyclerView.Adapter<RecyclerCurrentOrderAdapter.ItemListViewHolder>() {
 
+
     interface OnItemClickListener {
         fun showQRCode(orderID: String)
         fun cancelOrder(position: Int)
+        fun contactOrder(position: Int)
     }
 
     class ItemListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -36,6 +39,7 @@ class RecyclerCurrentOrderAdapter(
         val subTotalTV: TextView = itemView.findViewById(R.id.current_order_item_sub_total_tv)
         val showQRBtn: ExtendedFloatingActionButton = itemView.findViewById(R.id.current_order_item_show_qr_btn)
         val cancelBtn: ExtendedFloatingActionButton = itemView.findViewById(R.id.current_order_item_cancel_btn)
+        val contactBtn: ExtendedFloatingActionButton = itemView.findViewById(R.id.current_order_item_chat_btn)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemListViewHolder {
@@ -55,10 +59,15 @@ class RecyclerCurrentOrderAdapter(
         holder.paymentStatusTV.text = currentItem.paymentStatus
         holder.orderIDTV.text = currentItem.orderID
         holder.totalItemPriceTV.text = "\$%.2f".format(currentItem.totalItemPrice.toFloat())
-        //holder.totalTaxTV.text = "\$%.2f".format(currentItem.tax.toFloat())
-        //holder.subTotalTV.text = "\$%.2f".format(currentItem.subTotal.toFloat())
-
+        holder.totalTaxTV.text = ("\$%.2f".format(currentItem.tax.toFloat())).toString()
+        holder.subTotalTV.text = ("\$%.2f".format(currentItem.subTotal.toFloat())).toString()
+        Log.d("TAG",currentItem.situation)
         addTable(currentItem, holder.tableLayout)
+        if(currentItem.situation == "1"){
+            holder.cancelBtn.isEnabled=false
+            holder.cancelBtn.isClickable=false
+            holder.cancelBtn.setBackgroundColor(Color.GRAY)
+        }
 
         holder.showQRBtn.setOnClickListener {
             listener.showQRCode(currentItem.orderID)
@@ -66,6 +75,10 @@ class RecyclerCurrentOrderAdapter(
 
         holder.cancelBtn.setOnClickListener {
             listener.cancelOrder(position)
+        }
+
+        holder.contactBtn.setOnClickListener {
+            listener.contactOrder(position)
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.cafeteriaapp
 import adapters.RecyclerFoodItemAdapter
 import android.app.ActivityOptions
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
@@ -28,16 +29,27 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.Gson
 import datamodels.CartItem
 import datamodels.MenuItem
+import datamodels.NotificationData
+import datamodels.PushNotification
 import de.hdodenhof.circleimageview.CircleImageView
 import interfaces.MenuApi
 import interfaces.RequestType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import services.DatabaseHandler
 import services.FirebaseDBService
+//import services.FirebaseService
+//import services.RetrofitInstance
+//import com.google.firebase.iid.FirebaseInstanceId
 
+//const val TOPIC = "/topics/myTopic2"
 class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickListener, MenuApi {
-
+    val TAG = "Notification"
     private lateinit var auth: FirebaseAuth
     private lateinit var databaseRef: DatabaseReference
 
@@ -102,6 +114,35 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         databaseRef = FirebaseDatabase.getInstance().reference
 
         sharedPref = getSharedPreferences("user_profile_details", MODE_PRIVATE)
+/*
+        FirebaseService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
+
+        FirebaseMessaging.getInstance().token.addOnSuccessListener { result ->
+            if(result!=null){
+                FirebaseService.token = result
+            }
+        }
+
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+            FirebaseService.token = it.token
+            //etToken.setText(it.token)
+        }*/
+       /* FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
+
+        btnSend.setOnClickListener {
+            val title = "TITLE"
+            val message = "MESSAGE"
+            val recipientToken = etToken.text.toString()
+            if(title.isNotEmpty() && message.isNotEmpty() && recipientToken.isNotEmpty()) {
+                PushNotification(
+                    NotificationData(title, message),
+                    recipientToken
+                ).also {
+                    sendNotification(it)
+                }
+            }
+        }*/
+
         db.clearCartTable()
         loadProfile()
         loadNavigationDrawer()
@@ -113,6 +154,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
             openUserProfileActivity()
         }
     }
+
 
     private fun loadProfile() {
         val user = auth.currentUser!!
@@ -310,6 +352,12 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
                     shareApp()
                 }
                 R.id.nav_report_bug -> {
+                    /*startActivity(
+                        Intent(
+                            this,
+                            NotificationActivity::class.java
+                        )
+                    )*/
                     Toast.makeText(this, "Not Available", Toast.LENGTH_SHORT).show()
                 }
                 R.id.nav_contact_us -> {

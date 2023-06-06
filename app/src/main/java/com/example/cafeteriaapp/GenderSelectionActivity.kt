@@ -1,6 +1,7 @@
 package com.example.cafeteriaapp
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -19,6 +20,8 @@ class GenderSelectionActivity : AppCompatActivity() {
     private lateinit var maleSelectedBorder: ImageView
     private lateinit var femaleSelectedBorder: ImageView
 
+    private lateinit var sharedPref : SharedPreferences
+
     private var gender = "male"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +37,8 @@ class GenderSelectionActivity : AppCompatActivity() {
         val name = intent?.getStringExtra("name")!!
         val uid = intent?.getStringExtra("uid")!!
 
+        sharedPref = getSharedPreferences("user_profile_details", MODE_PRIVATE)
+
         findViewById<TextView>(R.id.gender_name_tv).text = "${name.split(" ")[0]}" //displaying first name
 
         findViewById<ExtendedFloatingActionButton>(R.id.gender_save_btn).setOnClickListener{
@@ -42,8 +47,11 @@ class GenderSelectionActivity : AppCompatActivity() {
     }
 
     private fun saveGenderToDatabase(uid: String) {
-        val dbRef = FirebaseDatabase.getInstance().reference.child("employees").child(uid)
-        dbRef.child("gender").setValue(this.gender)
+        val orgID = sharedPref.getString("emp_org","11")
+
+        val dbRef = FirebaseDatabase.getInstance().reference //.child("employees").child(uid)
+        //dbRef.child("gender").setValue(this.gender)
+        dbRef.child(orgID!!).child("employees").child(uid).child("gender").setValue(this.gender)
 
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         startActivity(Intent(this, MainActivity::class.java))

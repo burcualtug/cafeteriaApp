@@ -1,32 +1,38 @@
 package com.example.cafeteriaapp
 
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import datamodels.IdCardModel
 import repositories.UserRepository
+import services.FirebaseService
 import java.util.*
 
+const val TOPIC2 = "/topics/myTopic2"
 
 class RegisterUserActivity : AppCompatActivity() {
 
@@ -34,6 +40,7 @@ class RegisterUserActivity : AppCompatActivity() {
     private lateinit var databaseRef: DatabaseReference
     private lateinit var storageRef: StorageReference
     private lateinit var databaseRef2: DatabaseReference
+    private lateinit var databaseRefToken: DatabaseReference
 
     private lateinit var employeeIDCardIV: ImageView
 
@@ -75,6 +82,7 @@ class RegisterUserActivity : AppCompatActivity() {
         databaseRef = FirebaseDatabase.getInstance().reference.child("employees")
         storageRef = FirebaseStorage.getInstance().reference.child("employeeIdCards")
         databaseRef2 = FirebaseDatabase.getInstance().reference
+        databaseRefToken = FirebaseDatabase.getInstance().reference
 
         fullNameTIL = findViewById(R.id.register_full_name_til)
         emailTIL = findViewById(R.id.register_email_til)
@@ -258,7 +266,7 @@ class RegisterUserActivity : AppCompatActivity() {
                 // Image uploaded successfully
                 // Dismiss dialog
                 registerProgressDialog.dismiss()
-                Toast.makeText(this, "ID Card Uploaded!!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "ID Card Ushaploaded!!", Toast.LENGTH_SHORT).show()
                 reference.downloadUrl.addOnSuccessListener { uri ->
                     val model = IdCardModel(uri.toString())
                     addEmployeeDetailsToDatabase(user, model)
@@ -293,6 +301,16 @@ class RegisterUserActivity : AppCompatActivity() {
         val employee = employees.child(user.uid)
         val matches = databaseRef2.child("matches")
         val match = matches.child(user.uid)
+        FirebaseService.sharedPref2 = getSharedPreferences("sharedPref2", Context.MODE_PRIVATE)
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener{ task ->
+            if(!task.isSuccessful){
+                return@OnCompleteListener
+            }
+            val token = task.result
+            Log.d("FCMTOKEN",token)
+            databaseRefToken.child(companyID).child("tokens").child(user.uid).child("token").setValue(token)
+        })
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC2)
 
         employee.child("organization").setValue(orgName)
         employee.child("emp_id").setValue(empIDNo)
@@ -301,6 +319,7 @@ class RegisterUserActivity : AppCompatActivity() {
         employee.child("reg_id").setValue(getRegID())
         employee.child("reg_date").setValue(getRegDate())
         employee.child("emp_id_card_uri").setValue(idCardDownloadUri)
+
 
         match.child("organizationID").setValue(orgName)
         sendEmailVerification(user)

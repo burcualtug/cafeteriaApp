@@ -44,15 +44,7 @@ class UserProfileActivity : AppCompatActivity() {
         getOrgID()
         //loadUserProfile()
     }
-    /*init{
-        GlobalScope.launch { getLevel() }
-    }
-    suspend fun getLevel() {
-        val obj = repositories.UserRepository()
-        val user = FirebaseAuth.getInstance().currentUser!!
-        _orgIDData.value = obj.returncompanyID(user.uid)
-        Toast.makeText(this,_orgIDData.value,Toast.LENGTH_SHORT).show()
-    }*/
+
     private fun getOrgID(){
 
         val user = FirebaseAuth.getInstance().currentUser!!

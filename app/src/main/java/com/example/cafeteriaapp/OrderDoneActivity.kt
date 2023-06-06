@@ -1,26 +1,37 @@
 package com.example.cafeteriaapp
 
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import com.example.cafeteriaapp.R
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.StorageReference
+import com.google.gson.Gson
 import datamodels.CurrentOrderItem
+import datamodels.NotificationData
 import datamodels.OrderHistoryItem
+import datamodels.PushNotification
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import services.DatabaseHandler
+import services.FirebaseService
+import services.RetrofitInstance
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val TOPIC = "/topics/myTopic2"
 class OrderDoneActivity : AppCompatActivity() {
 
     private lateinit var completeLL: LinearLayout
@@ -38,6 +49,8 @@ class OrderDoneActivity : AppCompatActivity() {
 
     private var orderID = ""
     private var orderDate = ""
+    private var orderNote = ""
+    private var situation = ""
 
     private lateinit var auth: FirebaseAuth
     private lateinit var databaseRef: DatabaseReference
@@ -70,9 +83,11 @@ class OrderDoneActivity : AppCompatActivity() {
 
         paymentMethod = intent?.getStringExtra("paymentMethod").toString()
         takeAwayTime = intent?.getStringExtra("takeAwayTime").toString()
+        orderNote = intent?.getStringExtra("orderNote").toString()
 
         sharedPref = getSharedPreferences("user_profile_details", MODE_PRIVATE)
         databaseRef = FirebaseDatabase.getInstance().reference
+        auth = FirebaseAuth.getInstance()
 
         findViewById<TextView>(R.id.order_done_total_amount_tv).text = "%.2f".format(subTotalPrice)
         findViewById<TextView>(R.id.order_done_payment_method_tv).text = paymentMethod
@@ -88,6 +103,7 @@ class OrderDoneActivity : AppCompatActivity() {
         generateOrderID()
         setCurrentDateAndTime()
         saveOrderRecordToDatabase()
+        pushNewOrderNotification()
 
         findViewById<ImageView>(R.id.order_done_show_qr_iv).setOnClickListener { showQRCode() }
         findViewById<ImageView>(R.id.order_done_share_iv).setOnClickListener { shareOrder() }
@@ -133,22 +149,63 @@ class OrderDoneActivity : AppCompatActivity() {
         val item = CurrentOrderItem(
             orderID,
             takeAwayTime,
-            if(paymentMethod.startsWith("Pending")) "Pending" else "Done",
+            paymentMethod, //if(paymentMethod.startsWith("Pending")) "Pending" else "Done",
             getOrderItemNames(),
             getOrderItemQty(),
             totalItemPrice.toString(),
             totalTaxPrice.toString(),
-            subTotalPrice.toString()
+            subTotalPrice.toString(),
+            orderNote.toString(),
+            situation
         )
         val db = DatabaseHandler(this)
         db.insertCurrentOrdersData(item)
+    }
+
+    fun pushNewOrderNotification(){
+        val orgID = sharedPref.getString("emp_org", "11")
+        FirebaseService.sharedPref2 = getSharedPreferences("sharedPref2", Context.MODE_PRIVATE)
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener{ task ->
+            if(!task.isSuccessful){
+                return@OnCompleteListener
+            }
+            val token = task.result
+            Log.d("FCMTOKEN",token)
+
+            FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
+
+            Log.d("ORGIDSNAP",orgID.toString())
+            databaseRef.child(orgID!!).child("tokens").child("company")
+                .get().addOnSuccessListener {
+                    if(it.exists()){
+                        val orgToken = it.child("token").value.toString()
+                        sendNotification(PushNotification(
+                            NotificationData("You have a new order!", "Check the order: $orderID"),
+                            orgToken))
+                    }
+                }
+        })
 
 
     }
 
+    private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = RetrofitInstance.api.postNotification(notification)
+            if(response.isSuccessful) {
+                Log.d("TAG", "Response: ${Gson().toJson(response)}")
+            } else {
+                Log.e("TAG", response.errorBody().toString())
+            }
+        } catch(e: Exception) {
+            Log.e("TAG", e.toString())
+        }
+    }
     fun sendToBusiness(){
+        val user = auth.currentUser!!
         val orgID = sharedPref.getString("emp_org", "11")
-        val currentOrder = databaseRef.child(orgID!!).child("orders").child(orderID)
+        val currentOrder = databaseRef.child(orgID!!).child("orders").child(user.uid).child(orderID)
+        currentOrder.child("userUID").setValue(user.uid)
         currentOrder.child("order_id").setValue(orderID)
         currentOrder.child("takeAwayTime").setValue(takeAwayTime)
         currentOrder.child("paymentMethod").setValue(paymentMethod)
@@ -158,6 +215,7 @@ class OrderDoneActivity : AppCompatActivity() {
         currentOrder.child("totalTaxPrice").setValue(totalTaxPrice)
         currentOrder.child("subTotalPrice").setValue(subTotalPrice)
         currentOrder.child("situation").setValue("0")
+        currentOrder.child("orderNote").setValue(orderNote)
     }
 
     private fun cancelCurrentOrder() {

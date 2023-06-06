@@ -246,6 +246,27 @@
             android:gravity="center"
             />
 
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/current_order_item_chat_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:elevation="0dp"
+            app:elevation="0dp"
+            android:minHeight="10dp"
+            android:backgroundTint="#62EA0E"
+            android:text="Contact"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:icon="@drawable/ic_baseline_message_24"
+            app:iconTint="@color/white"
+            app:iconSize="20dp"
+            app:iconPadding="0dp"
+            android:gravity="center"
+            />
+
+
     </LinearLayout>
 
 </LinearLayout>

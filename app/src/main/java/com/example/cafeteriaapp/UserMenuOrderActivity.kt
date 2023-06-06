@@ -15,6 +15,8 @@ import android.widget.TextView
 import android.widget.TimePicker
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import datamodels.CartItem
 import datamodels.MenuItem
 import services.DatabaseHandler
@@ -34,6 +36,7 @@ class UserMenuOrderActivity : AppCompatActivity(), RecyclerOrderItemAdapter.OnIt
     private lateinit var subTotalTV: TextView
     private lateinit var proceedToPayBtn: Button
     private lateinit var orderTakeAwayTV: TextView
+    private lateinit var addNote: TextInputEditText
 
     private var totalPrice: Float = 0F
     private var totalItems: Int = 0
@@ -63,6 +66,7 @@ class UserMenuOrderActivity : AppCompatActivity(), RecyclerOrderItemAdapter.OnIt
         subTotalTV = findViewById(R.id.order_sub_total_tv)
         proceedToPayBtn = findViewById(R.id.proceed_to_pay_btn)
         orderTakeAwayTV = findViewById(R.id.order_take_away_time_tv)
+        addNote = findViewById(R.id.addNote)
 
         totalPrice = intent.getFloatExtra("totalPrice", 0F)
         totalItems = intent.getIntExtra("totalItems", 0)
@@ -138,6 +142,7 @@ class UserMenuOrderActivity : AppCompatActivity(), RecyclerOrderItemAdapter.OnIt
 
     fun goBack(view: View) {onBackPressed()}
 
+
     override fun emptyOrder() {
         AlertDialog.Builder(this)
                 .setMessage("Your order is now empty. Add some items from the food menu and place the order.")
@@ -155,6 +160,7 @@ class UserMenuOrderActivity : AppCompatActivity(), RecyclerOrderItemAdapter.OnIt
         intent.putExtra("totalTaxPrice", recyclerAdapter.getTotalTax())
         intent.putExtra("subTotalPrice", recyclerAdapter.getSubTotalPrice())
         intent.putExtra("takeAwayTime", orderTakeAwayTV.text.toString())
+        intent.putExtra("orderNote",addNote.text!!.toString())
         startActivity(intent)
 
     }

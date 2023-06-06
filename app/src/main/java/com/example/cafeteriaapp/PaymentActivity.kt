@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeteriaapp.R
 import datamodels.SavedCardItem
+import kotlinx.android.synthetic.main.activity_user_menu_order.*
 import services.DatabaseHandler
 
 class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemClickListener {
@@ -23,24 +24,21 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
     private lateinit var confirmPaymentBtn: Button
     private lateinit var paymentWalletBtn: Button
     private lateinit var paymentCreditDebitBtn: Button
-    private lateinit var paymentBhimUpiBtn: Button
 
     private lateinit var cashPaymentRB: RadioButton
     private lateinit var walletsRB: RadioButton
     private lateinit var savedCardRB: RadioButton
     private lateinit var creditDebitRB: RadioButton
-    private lateinit var bhimUpiRB: RadioButton
-    private lateinit var netBankingRB: RadioButton
 
     private lateinit var walletSection: LinearLayout
     private lateinit var creditDebitSection: LinearLayout
-    private lateinit var bhimUpiSection: LinearLayout
 
     private lateinit var allWalletsLL: LinearLayout
 
     var totalItemPrice = 0.0F
     var totalTaxPrice = 0.0F
     var subTotalPrice = 0.0F
+    var orderNote:String = ""
 
     var takeAwayTime = ""
 
@@ -76,6 +74,7 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
         subTotalPrice = intent.getFloatExtra("subTotalPrice", 0.0F)
 
         takeAwayTime = intent?.getStringExtra("takeAwayTime").toString()
+        orderNote = intent?.getStringExtra("orderNote").toString()
 
         totalPaymentTV = findViewById(R.id.total_payment_tv)
         totalPaymentTV.text = "\$%.2f".format(subTotalPrice)
@@ -84,12 +83,9 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
         walletsRB = findViewById(R.id.wallets_radio_btn)
         savedCardRB = findViewById(R.id.saved_cards_radio_btn)
         creditDebitRB = findViewById(R.id.credit_debit_card_radio_btn)
-       /* bhimUpiRB = findViewById(R.id.bhim_upi_radio_btn)
-        netBankingRB = findViewById(R.id.net_banking_radio_btn)*/
 
         walletSection = findViewById(R.id.wallets_section_ll)
         creditDebitSection = findViewById(R.id.credit_debit_section_ll)
-        //bhimUpiSection = findViewById(R.id.bhim_upi_section_ll)
 
         setupPaymentButtons()
         setupWallets()
@@ -146,21 +142,6 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
         paymentWalletBtn.setOnClickListener { orderDone() }
         paymentCreditDebitBtn.setOnClickListener { doCreditDebitCardPayment() }
        // paymentBhimUpiBtn.setOnClickListener { doBHIMUPIPayment() }
-    }
-
-    private fun doBHIMUPIPayment() {
-        val upiET: EditText = findViewById(R.id.payment_bhim_upi_et)
-        if(upiET.text.isEmpty()) {
-            upiET.error = "Enter Your UPI ID"
-            return
-        }
-        val pattern = Regex("([a-zA-Z0-9])@([a-zA-Z0-9])")
-        if(!pattern.containsMatchIn(upiET.text.toString())) {
-            upiET.error = "Invalid UPI ID"
-            return
-        }
-        enteredUPI = upiET.text.toString()
-        orderDone()
     }
 
     private fun doCreditDebitCardPayment() {
@@ -258,12 +239,9 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
     private fun orderDone() {
         var paymentMethod = ""
         when {
-            cashPaymentRB.isChecked -> paymentMethod = "Pending: Cash Payment"
-            walletsRB.isChecked -> paymentMethod = "Paid: $selectedWallet Wallet"
-            savedCardRB.isChecked -> paymentMethod = "Paid: $selectedSavedCard"
-            //creditDebitRB.isChecked -> paymentMethod = "Paid: $enteredCreditDebitCard"
-            //bhimUpiRB.isChecked -> paymentMethod = "Paid: $enteredUPI"
-            //netBankingRB.isChecked -> paymentMethod = "Paid: Net Banking"
+            cashPaymentRB.isChecked -> paymentMethod = "Cash Payment"
+            walletsRB.isChecked -> paymentMethod = "$selectedWallet Wallet"
+            savedCardRB.isChecked -> paymentMethod = "$selectedSavedCard"
         }
 
         val intent = Intent(this, OrderDoneActivity::class.java)
@@ -272,6 +250,7 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
         intent.putExtra("subTotalPrice", subTotalPrice)
         intent.putExtra("takeAwayTime", takeAwayTime)
         intent.putExtra("paymentMethod", paymentMethod)
+        intent.putExtra("orderNote",orderNote)
 
         startActivity(intent)
         finish()
