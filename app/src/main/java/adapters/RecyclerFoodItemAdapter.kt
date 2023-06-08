@@ -35,7 +35,7 @@ class RecyclerFoodItemAdapter(
         val itemImageIV: ImageView = itemView.findViewById(R.id.item_image)
         val itemNameTV: TextView = itemView.findViewById(R.id.item_name)
         val itemPriceTV: TextView = itemView.findViewById(R.id.item_price)
-        val itemStarsTV: TextView = itemView.findViewById(R.id.item_stars)
+        //val itemStarsTV: TextView = itemView.findViewById(R.id.item_stars)
         val itemShortDesc: TextView = itemView.findViewById(R.id.item_short_desc)
         val itemQuantityTV: TextView = itemView.findViewById(R.id.item_quantity_tv)
         val itemQuantityIncreaseIV: ImageView =
@@ -59,7 +59,7 @@ class RecyclerFoodItemAdapter(
 
         holder.itemNameTV.text = currentItem.itemName
         holder.itemPriceTV.text = "$${currentItem.itemPrice}"
-        holder.itemStarsTV.text = currentItem.itemStars.toString()
+        //holder.itemStarsTV.text = currentItem.itemStars.toString()
         holder.itemShortDesc.text = currentItem.itemShortDesc
         holder.itemQuantityTV.text = currentItem.quantity.toString()
 

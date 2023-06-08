@@ -179,6 +179,26 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
             })
     }
 
+    private fun getOrgID(){
+
+        val user = FirebaseAuth.getInstance().currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
+
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+
+                    Log.d("GLBID",globalOrgID)
+                    loadOnlineMenu(globalOrgID)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+    }
+
     private fun loadMenu() {
         val sharedPref: SharedPreferences = getSharedPreferences("settings", MODE_PRIVATE)
 
@@ -205,7 +225,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         }
 
         when (sharedPref.getInt("menuMode", 0)) {
-            0 -> loadOnlineMenu()
+            0 -> getOrgID()//loadOnlineMenu()
             1 -> { // Offline
                 val data = db.readOfflineMenuData()
 
@@ -221,7 +241,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
                         .setNegativeButton(
                             "No, Continue to Online Mode",
                             DialogInterface.OnClickListener { dialogInterface, _ ->
-                                loadOnlineMenu()
+                                getOrgID()//loadOnlineMenu()
                                 dialogInterface.dismiss()
                             })
                         .setCancelable(false)
@@ -251,7 +271,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         recyclerFoodAdapter.notifyItemRangeInserted(0, allItems.size)
     }
 
-    private fun loadOnlineMenu() {
+    private fun loadOnlineMenu(globalOrgID:String) {
         progressDialog = ProgressDialog(this)
         progressDialog.setCancelable(false)
         progressDialog.setTitle("Loading Menu...")
@@ -260,7 +280,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         progressDialog.show()
 
         val shp = sharedPref.getString("emp_org", "11")
-        FirebaseDBService().readAllMenu(this, RequestType.READ,shp!!)
+        FirebaseDBService().readAllMenu(this, RequestType.READ,globalOrgID)
     }
 
     private fun loadSearchTask() {

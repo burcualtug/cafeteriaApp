@@ -3,13 +3,15 @@ package com.example.cafeteriaapp
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.cafeteriaapp.R
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 
 
 class GenderSelectionActivity : AppCompatActivity() {
@@ -42,16 +44,35 @@ class GenderSelectionActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.gender_name_tv).text = "${name.split(" ")[0]}" //displaying first name
 
         findViewById<ExtendedFloatingActionButton>(R.id.gender_save_btn).setOnClickListener{
-            saveGenderToDatabase(uid)
+        getOrgID(uid)
+        //saveGenderToDatabase(uid)
         }
     }
+    private fun getOrgID(uid: String){
 
-    private fun saveGenderToDatabase(uid: String) {
+        val user = FirebaseAuth.getInstance().currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
+
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+
+                    Log.d("GLBID",globalOrgID)
+                    saveGenderToDatabase(globalOrgID,uid)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+    }
+    private fun saveGenderToDatabase(globalOrgID: String,uid: String) {
         val orgID = sharedPref.getString("emp_org","11")
 
         val dbRef = FirebaseDatabase.getInstance().reference //.child("employees").child(uid)
         //dbRef.child("gender").setValue(this.gender)
-        dbRef.child(orgID!!).child("employees").child(uid).child("gender").setValue(this.gender)
+        dbRef.child(globalOrgID).child("employees").child(uid).child("gender").setValue(this.gender)
 
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         startActivity(Intent(this, MainActivity::class.java))

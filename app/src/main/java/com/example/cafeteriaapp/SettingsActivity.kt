@@ -59,7 +59,12 @@ class SettingsActivity : AppCompatActivity(), MenuApi {
         sharedPref = getSharedPreferences("settings", MODE_PRIVATE)
 
         loadUserSettings()
+        developerContact()
         findViewById<ImageView>(R.id.settings_go_back_iv).setOnClickListener { onBackPressed() }
+    }
+
+    fun developerContact(){
+
     }
 
     private fun deleteAllTheOrdersHistoryDetails() {

@@ -148,11 +148,6 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
     }
 
     override fun cancelOrder(position: Int) {
-        //Toast.makeText(this,"STATE IS 1",Toast.LENGTH_SHORT).show()
-        /*if(currentOrderList[position].situation=="1"){
-            cancelButton.isClickable = false
-            //Toast.makeText(this,"STATE IS 1",Toast.LENGTH_SHORT).show()
-        }*/
         AlertDialog.Builder(this)
             .setTitle("Order Cancellation")
             .setMessage("Are you sure you want to cancel this order?")
@@ -167,7 +162,7 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
                 currentOrderList.removeAt(position)
                 recyclerAdapter.notifyItemRemoved(position)
                 recyclerAdapter.notifyItemRangeChanged(position, currentOrderList.size)
-                pushCancelOrderNotification()
+                pushCancelOrderNotification(position)
                 Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
 
                 if(currentOrderList.isEmpty()) {
@@ -182,7 +177,7 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
             .create().show()
     }
 
-    fun pushCancelOrderNotification(){
+    fun pushCancelOrderNotification(position: Int){
         val orgID = sharedPref.getString("emp_org", "11")
         FirebaseService.sharedPref2 = getSharedPreferences("sharedPref2", Context.MODE_PRIVATE)
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener{ task ->
@@ -194,14 +189,15 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
 
             FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
 
-            Log.d("ORGIDSNAP",orgID.toString())
+            val orderID=currentOrderList[position].orderID
+
             databaseRef.child(orgID!!).child("tokens").child("company")
                 .get().addOnSuccessListener {
                     if(it.exists()){
                         val orgToken = it.child("token").value.toString()
                         sendNotification(
                             PushNotification(
-                            NotificationData("Your order cancelled!", "You can check it from your orders history"),
+                            NotificationData("Your order cancelled!", "Order ID: $orderID"),
                             orgToken)
                         )
                     }

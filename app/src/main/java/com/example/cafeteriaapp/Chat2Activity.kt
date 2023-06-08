@@ -2,9 +2,11 @@ package com.example.cafeteriaapp
 
 import adapters.RecyclerChatAdapter
 import adapters.RecyclerCurrentOrderAdapter
+import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -12,11 +14,23 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeteriaapp.databinding.ActivityChat2Binding
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.Gson
 import datamodels.Chat
+import datamodels.NotificationData
+import datamodels.PushNotification
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import services.FirebaseService
+import services.RetrofitInstance
 
 class Chat2Activity : AppCompatActivity() {
 
@@ -32,6 +46,8 @@ class Chat2Activity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerAdapter: RecyclerCurrentOrderAdapter
 
+    private lateinit var databaseRef: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat2)
@@ -42,6 +58,7 @@ class Chat2Activity : AppCompatActivity() {
         recyclerView = findViewById(R.id.listRecyclerView)
 
         sharedPref = getSharedPreferences("user_profile_details", AppCompatActivity.MODE_PRIVATE)
+        databaseRef=FirebaseDatabase.getInstance().reference
 
         adapter = RecyclerChatAdapter()
         recyclerView.adapter = adapter
@@ -68,7 +85,10 @@ class Chat2Activity : AppCompatActivity() {
                     Toast.makeText(this,it.localizedMessage, Toast.LENGTH_LONG).show()
                     chatTxt.setText("")
                 }
+            pushChatNotification(userUID)
         }
+
+
 
         val userUID = auth.currentUser!!.uid
         firestore.collection("Chats").document(shp!!)
@@ -90,6 +110,46 @@ class Chat2Activity : AppCompatActivity() {
                 }
             }
             adapter.notifyDataSetChanged()
+        }
+    }
+
+
+    fun pushChatNotification(customerUID:String){
+        val orgID = sharedPref.getString("emp_org", "11")
+        FirebaseService.sharedPref2 = getSharedPreferences("sharedPref2", Context.MODE_PRIVATE)
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener{ task ->
+            if(!task.isSuccessful){
+                return@OnCompleteListener
+            }
+            val token = task.result
+            Log.d("FCMTOKEN",token)
+
+            FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
+
+            databaseRef.child(orgID!!).child("tokens").child(customerUID)
+                .get().addOnSuccessListener {
+                    if(it.exists()){
+                        val orgToken = it.child("token").value.toString()
+                        sendNotification(
+                            PushNotification(
+                                NotificationData("Your have new message!", "Check it"),
+                                orgToken)
+                        )
+                    }
+                }
+        })
+    }
+
+    private fun sendNotification(notification: PushNotification)= CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = RetrofitInstance.api.postNotification(notification)
+            if(response.isSuccessful) {
+                Log.d("TAG", "Response: ${Gson().toJson(response)}")
+            } else {
+                Log.e("TAG", response.errorBody().toString())
+            }
+        } catch(e: Exception) {
+            Log.e("TAG", e.toString())
         }
     }
 

@@ -318,6 +318,7 @@
                     android:paddingVertical="10dp"
                     android:clickable="true"
                     android:focusable="true"
+                    android:id="@+id/developerContact"
                     android:background="?android:attr/selectableItemBackground">
 
                     <TextView
