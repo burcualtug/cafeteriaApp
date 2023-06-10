@@ -8,8 +8,10 @@ import android.content.SharedPreferences
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import datamodels.MenuItem
 import interfaces.MenuApi
@@ -58,7 +60,7 @@ class SettingsActivity : AppCompatActivity(), MenuApi {
         menuModeLL.setOnClickListener { updateMenuMode() }
 
         updateMenuLL = findViewById(R.id.settings_update_menu_ll)
-        updateMenuLL.setOnClickListener { updateMenuForOffline() }
+        updateMenuLL.setOnClickListener { getOrgID() }
 
         deleteMenuLL = findViewById(R.id.settings_delete_menu_ll)
         deleteMenuLL.setOnClickListener { deleteOfflineMenu() }
@@ -159,14 +161,31 @@ class SettingsActivity : AppCompatActivity(), MenuApi {
         dialog.show()
     }
 
-    private fun updateMenuForOffline() {
+    private fun getOrgID(){
+        val user = FirebaseAuth.getInstance().currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
+
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+                    Log.d("GLBID",globalOrgID)
+
+                    updateMenuForOffline(globalOrgID)
+                }
+
+                override fun onCancelled(error: DatabaseError) {}
+            })
+    }
+
+    private fun updateMenuForOffline(orgID:String) {
         progressDialog = ProgressDialog(this)
         progressDialog.setTitle("Updating...")
         progressDialog.setMessage("Offline Menu is preparing for you...")
         progressDialog.show()
 
         val shp = sharedPref.getString("emp_org", "11")
-        FirebaseDBService().readAllMenu(this, RequestType.OFFLINE_UPDATE,shp!!)
+        FirebaseDBService().readAllMenu(this, RequestType.OFFLINE_UPDATE,orgID)
     }
 
     override fun onFetchSuccessListener(list: ArrayList<MenuItem>, requestType: RequestType) {
