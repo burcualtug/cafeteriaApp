@@ -127,14 +127,6 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
                 Chat2Activity::class.java
             )
         )
-        /*val intent = Intent(this, Chat2Activity::class.java)
-        startActivity(intent)*/
-       /* val fragment = ChatFragment()
-        val fragmentManager = supportFragmentManager // Activity içindeyseniz
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.currentOrdersLayout, fragment) // R.id.container, Fragment'ın yerleştirileceği bir View grubunu temsil eder
-        fragmentTransaction.addToBackStack(null) // Geri düğmesiyle fragment geçişini desteklemek için geri yığına ekle
-        fragmentTransaction.commit()*/
     }
 
     override fun showQRCode(orderID: String) {
@@ -148,6 +140,7 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
     }
 
     override fun cancelOrder(position: Int) {
+        getOrgID(position)
         AlertDialog.Builder(this)
             .setTitle("Order Cancellation")
             .setMessage("Are you sure you want to cancel this order?")
@@ -162,7 +155,8 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
                 currentOrderList.removeAt(position)
                 recyclerAdapter.notifyItemRemoved(position)
                 recyclerAdapter.notifyItemRangeChanged(position, currentOrderList.size)
-                pushCancelOrderNotification(position)
+
+                //pushCancelOrderNotification(position)
                 Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
 
                 if(currentOrderList.isEmpty()) {
@@ -177,8 +171,27 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
             .create().show()
     }
 
-    fun pushCancelOrderNotification(position: Int){
-        val orgID = sharedPref.getString("emp_org", "11")
+    private fun getOrgID(position:Int){
+
+        val user = FirebaseAuth.getInstance().currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
+
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+
+                    pushCancelOrderNotification(globalOrgID,position)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+    }
+
+    fun pushCancelOrderNotification(orgID:String,position: Int){
+        //val orgID = sharedPref.getString("emp_org", "11")
         FirebaseService.sharedPref2 = getSharedPreferences("sharedPref2", Context.MODE_PRIVATE)
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener{ task ->
             if(!task.isSuccessful){

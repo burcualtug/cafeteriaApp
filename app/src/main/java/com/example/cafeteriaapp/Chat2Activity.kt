@@ -16,8 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeteriaapp.databinding.ActivityChat2Binding
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -85,7 +84,8 @@ class Chat2Activity : AppCompatActivity() {
                     Toast.makeText(this,it.localizedMessage, Toast.LENGTH_LONG).show()
                     chatTxt.setText("")
                 }
-            pushChatNotification(userUID)
+            //pushChatNotification(userUID)
+            getOrgID(userUID)
         }
 
 
@@ -113,9 +113,28 @@ class Chat2Activity : AppCompatActivity() {
         }
     }
 
+    private fun getOrgID(userUID:String){
 
-    fun pushChatNotification(customerUID:String){
-        val orgID = sharedPref.getString("emp_org", "11")
+        val user = FirebaseAuth.getInstance().currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
+
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+
+                    pushChatNotification(globalOrgID,userUID)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+    }
+
+
+    fun pushChatNotification(orgID:String,customerUID:String){
+        //val orgID = sharedPref.getString("emp_org", "11")
         FirebaseService.sharedPref2 = getSharedPreferences("sharedPref2", Context.MODE_PRIVATE)
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener{ task ->
             if(!task.isSuccessful){

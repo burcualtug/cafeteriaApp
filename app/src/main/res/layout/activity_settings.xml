@@ -48,53 +48,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/data_saving"
-                    android:textStyle="bold"
-                    android:textColor="@color/purple_theme_color"
-                    android:textSize="15sp"
-                    android:layout_marginStart="25dp"/>
-
-                <LinearLayout
-                    android:id="@+id/settings_load_item_images_ll"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="25dp"
-                    android:paddingVertical="10dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="?android:attr/selectableItemBackground">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="1dp"
-                        android:text="@string/load_item_images"
-                        android:textColor="#2B2A2A"
-                        android:textSize="18sp"/>
-
-                    <TextView
-                        android:id="@+id/settings_load_item_images_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/on"
-                        android:textSize="15sp"/>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginBottom="10dp">
 
                 <TextView

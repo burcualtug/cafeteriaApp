@@ -103,7 +103,8 @@ class OrderDoneActivity : AppCompatActivity() {
         generateOrderID()
         setCurrentDateAndTime()
         saveOrderRecordToDatabase()
-        pushNewOrderNotification()
+        getOrgID()
+        //pushNewOrderNotification()
 
         findViewById<ImageView>(R.id.order_done_show_qr_iv).setOnClickListener { showQRCode() }
         findViewById<ImageView>(R.id.order_done_share_iv).setOnClickListener { shareOrder() }
@@ -162,8 +163,27 @@ class OrderDoneActivity : AppCompatActivity() {
         db.insertCurrentOrdersData(item)
     }
 
-    fun pushNewOrderNotification(){
-        val orgID = sharedPref.getString("emp_org", "11")
+    private fun getOrgID(){
+
+        val user = FirebaseAuth.getInstance().currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
+
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+
+                    pushNewOrderNotification(globalOrgID)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+    }
+
+    fun pushNewOrderNotification(orgID:String){
+        //val orgID = sharedPref.getString("emp_org", "11")
         FirebaseService.sharedPref2 = getSharedPreferences("sharedPref2", Context.MODE_PRIVATE)
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener{ task ->
             if(!task.isSuccessful){

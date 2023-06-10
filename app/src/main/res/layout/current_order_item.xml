@@ -261,7 +261,7 @@
             android:textColor="@color/white"
             app:icon="@drawable/ic_baseline_message_24"
             app:iconTint="@color/white"
-            app:iconSize="20dp"
+            app:iconSize="15dp"
             app:iconPadding="0dp"
             android:gravity="center"
             />
