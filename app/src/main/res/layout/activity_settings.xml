@@ -312,28 +312,49 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="25dp"
-                    android:paddingVertical="10dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:id="@+id/developerContact"
-                    android:background="?android:attr/selectableItemBackground">
+                    android:orientation="horizontal">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="1dp"
-                        android:text="@string/developer"
-                        android:textColor="#2B2A2A"
-                        android:textSize="18sp"/>
+                        android:orientation="vertical"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="25dp"
+                        android:paddingVertical="10dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/developer_name"
-                        android:textSize="15sp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="1dp"
+                            android:text="@string/developer"
+                            android:textColor="#2B2A2A"
+                            android:textSize="18sp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/developer_name"
+                            android:textSize="15sp"/>
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:id="@+id/github_logo"
+                        android:layout_marginTop="34dp"
+                        android:layout_marginLeft="170dp"
+                        android:src="@drawable/github_logo"/>
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="30dp"
+                        android:id="@+id/linkedin_logo"
+                        android:src="@drawable/linkedin_logo"/>
 
                 </LinearLayout>
 

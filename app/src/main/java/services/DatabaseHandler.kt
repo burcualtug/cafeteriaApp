@@ -1,5 +1,6 @@
 package services
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -205,6 +206,7 @@ class DatabaseHandler(val context: Context) : SQLiteOpenHelper(context, DATABASE
         }
     }
 
+    @SuppressLint("Range")
     fun readOfflineMenuData(): MutableList<MenuItem> {
         val list: MutableList<MenuItem> = ArrayList()
 

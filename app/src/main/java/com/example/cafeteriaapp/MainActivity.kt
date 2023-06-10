@@ -114,6 +114,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         databaseRef = FirebaseDatabase.getInstance().reference
 
         sharedPref = getSharedPreferences("user_profile_details", MODE_PRIVATE)
+        progressDialog =  ProgressDialog(this)
 /*
         FirebaseService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
 
@@ -391,10 +392,10 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
                         )
                     }, drawerDelay)
                 }
-                R.id.nav_update_menu -> {
+                /*R.id.nav_update_menu -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     updateOfflineFoodMenu()
-                }
+                }*/
                 R.id.nav_settings -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     Handler().postDelayed({
