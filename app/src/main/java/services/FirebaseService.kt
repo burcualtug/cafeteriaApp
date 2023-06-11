@@ -49,7 +49,6 @@ class FirebaseService : FirebaseMessagingService() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager)
         }
-//PendingIntent.FLAG_ONE_SHOT
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)

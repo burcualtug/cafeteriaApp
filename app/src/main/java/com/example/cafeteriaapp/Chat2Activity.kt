@@ -62,7 +62,6 @@ class Chat2Activity : AppCompatActivity() {
         adapter = RecyclerChatAdapter()
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
-        //bindingChat.listRecyclerView.layoutManager = LinearLayoutManager(this)
 
         val shp = sharedPref.getString("emp_org", "11")
 
@@ -76,19 +75,15 @@ class Chat2Activity : AppCompatActivity() {
             dataMap.put("text",chatText)
             dataMap.put("user",user)
             dataMap.put("date", FieldValue.serverTimestamp())
-//cJW1QnwvlgM0nWACxRWtbMvMCtk1
             firestore.collection("Chats").document(shp!!)
                 .collection(userUID).add(dataMap).addOnSuccessListener {
                     chatTxt.setText("")
                 }.addOnFailureListener {
                     Toast.makeText(this,it.localizedMessage, Toast.LENGTH_LONG).show()
                     chatTxt.setText("")
-                }
-            //pushChatNotification(userUID)
+                } //pushChatNotification(userUID)
             getOrgID(userUID)
         }
-
-
 
         val userUID = auth.currentUser!!.uid
         firestore.collection("Chats").document(shp!!)

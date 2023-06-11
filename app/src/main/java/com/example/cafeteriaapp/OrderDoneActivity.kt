@@ -143,7 +143,7 @@ class OrderDoneActivity : AppCompatActivity() {
         db.insertOrderData(item)
 
         saveCurrentOrderToDatabase()
-        sendToBusiness()
+        getOrgIDSave()
     }
 
     private fun saveCurrentOrderToDatabase() {
@@ -221,9 +221,28 @@ class OrderDoneActivity : AppCompatActivity() {
             Log.e("TAG", e.toString())
         }
     }
-    fun sendToBusiness(){
+
+    private fun getOrgIDSave(){
+
+        val user = FirebaseAuth.getInstance().currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
+
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+                    sendToBusiness(globalOrgID)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+    }
+
+    fun sendToBusiness(orgID:String){
         val user = auth.currentUser!!
-        val orgID = sharedPref.getString("emp_org", "11")
+        //val orgID = sharedPref.getString("emp_org", "11")
         val currentOrder = databaseRef.child(orgID!!).child("orders").child(user.uid).child(orderID)
         currentOrder.child("userUID").setValue(user.uid)
         currentOrder.child("order_id").setValue(orderID)

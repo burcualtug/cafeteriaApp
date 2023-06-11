@@ -54,16 +54,33 @@ class MyCurrentOrdersActivity : AppCompatActivity(), RecyclerCurrentOrderAdapter
         recyclerView.adapter = recyclerAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        loadCurrentOrdersFromDatabase()
+        getOrgIDLoad()//loadCurrentOrdersFromDatabase()
     }
+    private fun getOrgIDLoad(){
 
-    private fun loadCurrentOrdersFromDatabase() {
+        val user = FirebaseAuth.getInstance().currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
+
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+
+                    loadCurrentOrdersFromDatabase(globalOrgID)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+    }
+    private fun loadCurrentOrdersFromDatabase(orgID: String) {
 
         val db = DatabaseHandler(this)
         val data = db.readCurrentOrdersData()
         val user=auth.currentUser!!
         val shp = sharedPref.getString("emp_org", "11")
-        val ordersDbRef = databaseRef.child(shp!!).child("orders").child(user.uid)
+        val ordersDbRef = databaseRef.child(orgID).child("orders").child(user.uid)
 
         findViewById<LinearLayout>(R.id.current_order_empty_indicator_ll).visibility = ViewGroup.GONE
         ordersDbRef.addListenerForSingleValueEvent(object : ValueEventListener {

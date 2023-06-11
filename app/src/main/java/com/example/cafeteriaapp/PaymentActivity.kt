@@ -39,6 +39,7 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
     var totalTaxPrice = 0.0F
     var subTotalPrice = 0.0F
     var orderNote:String = ""
+    val paymentMethod: String = ""
 
     var takeAwayTime = ""
 
@@ -240,6 +241,7 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
         var paymentMethod = ""
         when {
             cashPaymentRB.isChecked -> paymentMethod = "Cash Payment"
+            creditDebitRB.isChecked -> paymentMethod = "Card Payment"
             walletsRB.isChecked -> paymentMethod = "$selectedWallet Wallet"
             savedCardRB.isChecked -> paymentMethod = "$selectedSavedCard"
         }
@@ -288,7 +290,8 @@ class PaymentActivity : AppCompatActivity(), RecyclerSavedCardsAdapter.OnItemCli
     }
 
     override fun onItemPayButtonClick(position: Int) {
-        selectedSavedCard = "XXXX${savedCardItems[position].cardNumber.substring(12,16)}, ${savedCardItems[position].cardHolderName}"
+        //selectedSavedCard = "XXXX${savedCardItems[position].cardNumber.substring(12,16)}, ${savedCardItems[position].cardHolderName}"
+        selectedSavedCard = savedCardItems[position].cardHolderName
         orderDone()
     }
 }
