@@ -257,7 +257,7 @@
                         android:id="@+id/app_version_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/app_version_number"
+                        android:text="21.0.0"
                         android:textSize="15sp"/>
 
                 </LinearLayout>
@@ -310,6 +310,53 @@
                         android:src="@drawable/linkedin_logo"/>
 
                 </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Account"
+                    android:textStyle="bold"
+                    android:textColor="@color/purple_theme_color"
+                    android:textSize="15sp"
+                    android:layout_marginStart="25dp"/>
+
+                <LinearLayout
+                    android:id="@+id/settings_delete_account"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="25dp"
+                    android:paddingVertical="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="1dp"
+                        android:text="Delete Account"
+                        android:textColor="#2B2A2A"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/delete_account"
+                        android:textSize="15sp"/>
+
+                </LinearLayout>
+
+
+
 
             </LinearLayout>
 

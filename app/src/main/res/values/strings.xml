@@ -143,4 +143,5 @@
     <string name="show_this_qr_code_to_your_office_canteen">Show this QR Code to your Local Business</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="delete_account">You would not be able to login to your account</string>
 </resources>
