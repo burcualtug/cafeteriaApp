@@ -115,37 +115,9 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
 
         sharedPref = getSharedPreferences("user_profile_details", MODE_PRIVATE)
         progressDialog =  ProgressDialog(this)
-/*
-        FirebaseService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
-
-        FirebaseMessaging.getInstance().token.addOnSuccessListener { result ->
-            if(result!=null){
-                FirebaseService.token = result
-            }
-        }
-
-        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
-            FirebaseService.token = it.token
-            //etToken.setText(it.token)
-        }*/
-       /* FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
-
-        btnSend.setOnClickListener {
-            val title = "TITLE"
-            val message = "MESSAGE"
-            val recipientToken = etToken.text.toString()
-            if(title.isNotEmpty() && message.isNotEmpty() && recipientToken.isNotEmpty()) {
-                PushNotification(
-                    NotificationData(title, message),
-                    recipientToken
-                ).also {
-                    sendNotification(it)
-                }
-            }
-        }*/
 
         db.clearCartTable()
-        loadProfile()
+        getOrgIDProfile()//loadProfile()
         loadNavigationDrawer()
         loadMenu()
         loadSearchTask()
@@ -156,8 +128,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         }
     }
 
-
-    private fun loadProfile() {
+    private fun loadProfile(orgID:String) {
         val user = auth.currentUser!!
         this.empName = user.displayName!!
         this.empEmail = user.email!!
@@ -166,7 +137,8 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
             findViewById<TextView>(R.id.nav_header_user_name).text = this.empName
         }, 1000)
 
-        databaseRef.child("employees")
+
+        databaseRef.child(orgID).child("employees")
             .child(user.uid).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     empGender = snapshot.child("gender").value.toString()
@@ -177,6 +149,24 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
                 }
 
                 override fun onCancelled(error: DatabaseError) {}
+            })
+    }
+
+    private fun getOrgIDProfile(){
+
+        val user = FirebaseAuth.getInstance().currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
+
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+                    loadProfile(globalOrgID)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
             })
     }
 
