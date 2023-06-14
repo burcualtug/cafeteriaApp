@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
 
         userIcon = findViewById(R.id.menu_user_icon)
         userIcon.setOnClickListener {
-            openUserProfileActivity()
+             getOrgIDIntent()//openUserProfileActivity()
         }
     }
 
@@ -335,7 +335,7 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
                 }
                 R.id.nav_profile -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
-                    Handler().postDelayed({ openUserProfileActivity() }, drawerDelay)
+                    Handler().postDelayed({ getOrgIDIntent() }, drawerDelay)
                 }
                 R.id.nav_my_orders -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
@@ -473,10 +473,39 @@ class MainActivity : AppCompatActivity(), RecyclerFoodItemAdapter.OnItemClickLis
         bottomDialog.show(supportFragmentManager, "BottomSheetDialog")
     }
 
-    private fun openUserProfileActivity() {
-        val intent = Intent(this, UserProfileActivity::class.java)
-        intent.putExtra("gender", this.empGender)
+    private fun getOrgIDIntent(){
+        val user = auth.currentUser!!
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().reference
 
+        databaseRef.child("matches").child(user.uid)
+            .addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val globalOrgID = snapshot.child("organizationID").value.toString()
+                    openUserProfileActivity(globalOrgID)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+    }
+
+    private fun openUserProfileActivity(orgID:String) {
+        val user = FirebaseAuth.getInstance().currentUser!!
+        databaseRef.child(orgID).child("employees")
+            .child(user.uid).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    empGender = snapshot.child("gender").value.toString()
+                    val intent = Intent(applicationContext, UserProfileActivity::class.java)
+                    intent.putExtra("gender", empGender)
+                    transitionAnimation(intent)
+                }
+
+                override fun onCancelled(error: DatabaseError) {}
+            })
+    }
+
+    private fun transitionAnimation(intent:Intent){
         val options =
             ActivityOptions.makeSceneTransitionAnimation(this, userIcon, "userIconTransition")
         startActivity(intent, options.toBundle())
